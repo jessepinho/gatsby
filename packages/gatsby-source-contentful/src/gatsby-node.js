@@ -194,6 +194,7 @@ exports.sourceNodes = async (
   contentTypeItems.forEach((contentTypeItem, i) => {
     normalize.createNodesForContentType({
       contentTypeItem,
+      contentTypeItems,
       restrictedNodeFields,
       conflictFieldPrefix,
       entries: entryList[i],
