@@ -40,6 +40,10 @@ exports.sourceNodes = async (
 ) => {
   const { createNode, deleteNode, touchNode, setPluginStatus } = actions
 
+  console.warn(
+    `You're using a version of the gatsby-source-contentful plugin which is not officially supported. If you are not sure you should be using this version, probably you should use the official one instead.`
+  )
+
   const online = await isOnline()
 
   // If the user knows they are offline, serve them cached result
@@ -262,7 +266,7 @@ exports.onPreExtractQueries = async ({ store, getNodesByType }) => {
   // We have both gatsby-image installed as well as ImageSharp nodes so let's
   // add our fragments to .cache/fragments.
   await fs.copy(
-    require.resolve(`gatsby-source-contentful/src/fragments.js`),
+    require.resolve(`@clue/gatsby-source-contentful/src/fragments.js`),
     `${program.directory}/.cache/fragments/contentful-asset-fragments.js`
   )
 }

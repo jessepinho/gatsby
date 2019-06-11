@@ -1,5 +1,9 @@
 # gatsby-source-contentful
 
+## IMPORTANT NOTICE
+
+This is a fork of the [original repository](https://github.com/gatsbyjs/gatsby) that has [this PR](https://github.com/gatsbyjs/gatsby/pull/14616) and [this PR](https://github.com/gatsbyjs/gatsby/pull/14612) merged into it. I (@jessepinho) didn't want to wait until those are merged and published in the main repo before using the changes, as the bugs they fix are blocking.
+
 Source plugin for pulling content types, entries, and assets into Gatsby from
 Contentful spaces. It creates links between entry types and asset so they can be
 queried in Gatsby using GraphQL.

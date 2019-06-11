@@ -1,5 +1,5 @@
 {
-  "name": "gatsby-source-contentful",
+  "name": "@clue/gatsby-source-contentful",
   "description": "Gatsby source plugin for building websites using the Contentful CMS as a data source",
   "version": "2.1.5",
   "author": "Marcus Ericsson <mericsson@gmail.com> (mericsson.com)",
