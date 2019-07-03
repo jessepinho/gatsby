@@ -195,6 +195,7 @@ exports.sourceNodes = async (
       }
     })
 
+  const nodeFilter = pluginConfig.get(`nodeFilter`) || (() => true)
   contentTypeItems.forEach((contentTypeItem, i) => {
     normalize.createNodesForContentType({
       contentTypeItem,
@@ -209,6 +210,7 @@ exports.sourceNodes = async (
       defaultLocale,
       locales,
       options: pluginOptions,
+      nodeFilter,
     })
   })
 
@@ -219,6 +221,7 @@ exports.sourceNodes = async (
       createNodeId,
       defaultLocale,
       locales,
+      nodeFilter,
     })
   })
 
