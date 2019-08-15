@@ -40,8 +40,7 @@ const optionsSchema = Joi.object().keys({
       excludeEntryFields: Joi.array().items(Joi.string()),
       entryFieldTransformer: Joi.func(),
     })
-    .oxor(`includeEntryFields`, `excludeEntryFields`, `entryFieldTransformer`),
-  nodeFilter: Joi.func(),
+    .oxor(`includeEntryFields`, `excludeEntryFields`),
 })
 
 const maskedFields = [`accessToken`, `spaceId`]
