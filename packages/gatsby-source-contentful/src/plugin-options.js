@@ -38,8 +38,9 @@ const optionsSchema = Joi.object().keys({
     .keys({
       includeEntryFields: Joi.array().items(Joi.string()),
       excludeEntryFields: Joi.array().items(Joi.string()),
+      entryFieldTransformer: Joi.func(),
     })
-    .oxor(`includeEntryFields`, `excludeEntryFields`),
+    .oxor(`includeEntryFields`, `excludeEntryFields`, `entryFieldTransformer`),
   nodeFilter: Joi.func(),
 })
 
