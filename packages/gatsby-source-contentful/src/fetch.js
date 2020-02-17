@@ -72,7 +72,7 @@ ${formatPluginOptionsForCLI(pluginConfig.getOriginalPluginOptions(), errors)}`)
   // Temporary replacement for `client.sync`. See details below, where this
   // function is called.
   async function getAllEntriesAndAssets() {
-    const entriesPageSize = 50
+    const entriesPageLimit = pluginConfig.get(`entriesPageLimit`) || 50
 
     let entriesRemaining = true
     let skipEntries = 0
@@ -80,39 +80,39 @@ ${formatPluginOptionsForCLI(pluginConfig.getOriginalPluginOptions(), errors)}`)
     while (entriesRemaining) {
       console.log(
         `FETCHING ENTRIES ${skipEntries + 1} TO ${skipEntries +
-          entriesPageSize}`
+          entriesPageLimit}`
       )
       const fetchedEntries = await client.getEntries({
         include: 0,
         skip: skipEntries,
-        limit: entriesPageSize,
+        limit: entriesPageLimit,
         locale: `*`,
       })
       if (fetchedEntries.items.length) {
         entries = [...entries, ...fetchedEntries.items]
-        skipEntries += entriesPageSize
+        skipEntries += entriesPageLimit
       } else {
         entriesRemaining = false
       }
     }
 
-    const assetsPageSize = 100
+    const assetsPageLimit = pluginConfig.get(`assetsPageLimit`) || 100
 
     let assetsRemaining = true
     let skipAssets = 0
     let assets = []
     while (assetsRemaining) {
       console.log(
-        `FETCHING ASSETS ${skipAssets + 1} TO ${skipAssets + assetsPageSize}`
+        `FETCHING ASSETS ${skipAssets + 1} TO ${skipAssets + assetsPageLimit}`
       )
       const fetchedAssets = await client.getAssets({
         skip: skipAssets,
-        limit: assetsPageSize,
+        limit: assetsPageLimit,
         locale: `*`,
       })
       if (fetchedAssets.items.length) {
         assets = [...assets, ...fetchedAssets.items]
-        skipAssets += assetsPageSize
+        skipAssets += assetsPageLimit
       } else {
         assetsRemaining = false
       }

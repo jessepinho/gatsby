@@ -168,6 +168,14 @@ If you have entries that reference each other via their rich-text fields, Gatsby
 
 This allows for the transformation of rich-text fields in any way. It allows you to pass in a rich-text field into a function and then modify/add/delete inner field values.
 
+**`entriesPageLimit`** [number][optional] [default: `50`]
+
+The number of entries that should be fetched at a time when using the `getEntries` API. This helps prevent `Response size too big` 400 errors.
+
+**`assetsPageLimit`** [number][optional] [default: `100`]
+
+The number of assets that should be fetched at a time when using the `getAssets` API. This helps prevent `Response size too big` 400 errors.
+
 ## Notes on Contentful Content Models
 
 There are currently some things to keep in mind when building your content models at Contentful.
