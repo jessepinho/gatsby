@@ -1,6 +1,8 @@
 const contentful = require(`contentful`)
 const _ = require(`lodash`)
 const chalk = require(`chalk`)
+const resolveResponse = require(`contentful-resolve-response`)
+
 const normalize = require(`./normalize`)
 const { formatPluginOptionsForCLI } = require(`./plugin-options`)
 
@@ -15,6 +17,8 @@ module.exports = async ({ syncToken, reporter, pluginConfig }) => {
     accessToken: pluginConfig.get(`accessToken`),
     host: pluginConfig.get(`host`),
     environment: pluginConfig.get(`environment`),
+    // TODO: Remove this once we're using the Sync API again.
+    resolveLinks: false,
   }
 
   const client = contentful.createClient(contentfulClientOptions)
@@ -65,10 +69,87 @@ Used options:
 ${formatPluginOptionsForCLI(pluginConfig.getOriginalPluginOptions(), errors)}`)
   }
 
+  // Temporary replacement for `client.sync`. See details below, where this
+  // function is called.
+  async function getAllEntriesAndAssets() {
+    const entriesPageSize = 50
+
+    let entriesRemaining = true
+    let skipEntries = 0
+    let entries = []
+    while (entriesRemaining) {
+      console.log(
+        `FETCHING ENTRIES ${skipEntries + 1} TO ${skipEntries +
+          entriesPageSize}`
+      )
+      const fetchedEntries = await client.getEntries({
+        include: 0,
+        skip: skipEntries,
+        limit: entriesPageSize,
+        locale: `*`,
+      })
+      if (fetchedEntries.items.length) {
+        entries = [...entries, ...fetchedEntries.items]
+        skipEntries += entriesPageSize
+      } else {
+        entriesRemaining = false
+      }
+    }
+
+    const assetsPageSize = 100
+
+    let assetsRemaining = true
+    let skipAssets = 0
+    let assets = []
+    while (assetsRemaining) {
+      console.log(
+        `FETCHING ASSETS ${skipAssets + 1} TO ${skipAssets + assetsPageSize}`
+      )
+      const fetchedAssets = await client.getAssets({
+        skip: skipAssets,
+        limit: assetsPageSize,
+        locale: `*`,
+      })
+      if (fetchedAssets.items.length) {
+        assets = [...assets, ...fetchedAssets.items]
+        skipAssets += assetsPageSize
+      } else {
+        assetsRemaining = false
+      }
+    }
+
+    // Manually resolve entries with each other and with assets
+    const resolvedEntries = resolveResponse(
+      {
+        sys: { type: `Array` },
+        includes: { Asset: assets },
+        items: entries,
+      },
+      { itemEntryPoints: [`fields`] }
+    )
+
+    return {
+      entries: resolvedEntries,
+      assets,
+      deletedEntries: [],
+      deletedAssets: [],
+    }
+  }
+
   let currentSyncData
   try {
-    let query = syncToken ? { nextSyncToken: syncToken } : { initial: true }
-    currentSyncData = await client.sync(query)
+    // TODO: Re-enable the Sync API once Contentful fixes it. This change is due
+    // to the fact that Contentful's Sync API doesn't respect its own response
+    // size limit of 7MB. Since we can't tell the Sync API how many items to
+    // fetch per "page", there's no way to avoid the Sync API breaking when the
+    // articles in a single page are too big. Thus, we have to make our own
+    // method of fetching all entries/assets, which we'll use until Contentful
+    // has fixed this issue. For more info, see the email thread started on 14
+    // Feb 2020, with the subject line "[Support] Re: Sync API returning
+    // "Response size too big".
+    // let query = syncToken ? { nextSyncToken: syncToken } : { initial: true }
+    // currentSyncData = await client.sync(query)
+    currentSyncData = await getAllEntriesAndAssets()
   } catch (e) {
     reporter.panic(`Fetching contentful data failed`, e)
   }
